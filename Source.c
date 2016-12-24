@@ -4,7 +4,7 @@ int multiply(int m1, int m2);
 int Dice(int pos);
 int pos = 1, turnsofdice = 0, turnsofgame = 0;
 int a[101];
-long numberofdiceturns = 10000;
+long numberofdiceturns = 1000;
 void runGame(), TurnsofDice(), fillLadders(), fillSnakes(), numberofGames(), printGameStats();
 int SnakesLadders();
 int ladderStart[] = { 8,19,21,28,36,43,50,54,61,62,66 };
@@ -16,7 +16,7 @@ int snakeHit[11];
 int lIndex[101];
 int sIndex[101];
 int turnsofdiceforagame = 0;
-long turnsasmoney = 10000;
+float turnsasmoney = 100;
 float basispoint = 100;
 /*	int pos=1,turnsofdice=0,turnsofgame=0;
 	int a[]=new int[101];
@@ -160,10 +160,10 @@ void printGameStats()
 	printf("turnsofdice= %d \n" , turnsofdice);
 	printf("turnsofgame= %d \n" , turnsofgame);
 	printf("numberofdiceturns= %d \n" , numberofdiceturns);
-	printf("turnsofdiceindistance= %f \n" , turnsofdice*3.5);
-	printf("turnsasmoney= %u \n" , turnsasmoney);
+	//printf("turnsofdiceindistance= %f \n" , turnsofdice*3.5);
+	printf("turnsasmoney= %f \n" , turnsasmoney);
 	//System.out.println("numberofdiceturnsindistance="+(long)(numberofdiceturns*3.5));
-	printf("pos=" + pos);
+	printf("pos= %d" , pos);
 	for (int i = 1; i <= 11; i++)
 		printf("LadderHit%d = %d" , i , ladderHit[i]);
 	for (int i = 1; i <= 10; i++)
