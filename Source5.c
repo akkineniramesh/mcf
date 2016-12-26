@@ -8,6 +8,7 @@ int pos = 1, turnsofdice = 0, turnsofgame = 0;
 int a[101];
 long numberofdiceturns = 30000;
 void runGame(), TurnsofDice(), fillLadders(), fillSnakes(), numberofGames(), printGameStats(), logmultiple(), runGames();
+void fillSnakesrand(), fillLaddersrand(), printGameStatsrand();
 int SnakesLadders();
 int ladderStart[] = { 8,19,21,28,36,43,50,54,61,62,66 };
 int ladderEnd[] = { 26,38,82,53,57,77,91,88,99,96,87 };
@@ -72,6 +73,7 @@ main()
 	//runGame();
 	//printGameStats();
 	runGames();
+	printGameStatsrand();
 	printf("hello ramesh\n");
 	getchar();
 }
@@ -99,8 +101,10 @@ void runGame()
 	for (int i = 1; i < 11; i++)snakeHit[i] = 0;
 	//getSnakesLadders(args);
 	//System.out.println("turnsasmoneyatstart=" + turnsasmoney);
-	fillLadders();
-	fillSnakes();
+	//fillLadders();
+	//fillSnakes();
+	fillLaddersrand();
+	fillSnakesrand();
 	while (turnsofdice<numberofdiceturns)
 	{
 		pos = Dice(pos);
@@ -193,7 +197,7 @@ void logmultiple()
 }
 void runGames()
 {
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < 15; i++)
 	{
 		turnsasmoneytakeninx = i;
 		//printf(" turnsasmoneytakeninx %f ", turnsasmoneytakeninx);
@@ -203,4 +207,43 @@ void runGames()
 		turnsofdice = 0;
 		turnsofgame = 0;
 	}
+}
+void fillLaddersrand()
+{
+	for (int i = 0; i<11; i++)
+	{
+		if ((rand() % 6) > 2)
+		{
+		a[ladderStart[i]] = ladderEnd[i];
+		lIndex[ladderStart[i]] = i + 1;
+		}
+	}
+}
+void fillSnakesrand()
+{
+	for (int i = 0; i<10; i++)
+	{
+		if ((rand() % 6) > 2)
+		{
+			a[snakeStart[i]] = snakeEnd[i];
+			sIndex[snakeStart[i]] = i + 1;
+		}
+	}
+}
+void printGameStatsrand()
+{
+	//printf("turnsofdice= %d \n", turnsofdice);
+	//printf("turnsofgame= %d \n", turnsofgame);
+	//printf("numberofdiceturns= %d \n", numberofdiceturns);
+	//printf("turnsofdiceindistance= %f \n" , turnsofdice*3.5);
+	//printf("turnsasmoney= %f \n", turnsasmoney);
+	//System.out.println("numberofdiceturnsindistance="+(long)(numberofdiceturns*3.5));
+	//printf(" loggametotalmultiple %e ", loggametotalmultiple);
+	//printf(" gametotalmultiple %f \n", gametotalmultiple);
+	//printf(" %f \n", gametotalmultiple);
+	//printf("pos= %d", pos);
+	for (int i = 1; i <= 11; i++)
+	printf("LadderHit%d = %d \n", i, ladderHit[i]);
+	for (int i = 1; i <= 10; i++)
+	printf("SnakeHit%d = %d \n", i, snakeHit[i]);
 }
