@@ -10,7 +10,7 @@ long numberofdiceturns = 30000;
 void runGame(), TurnsofDice(), fillLadders(), fillSnakes(), numberofGames(), printGameStats(), logmultiple(), runGames();
 void fillSnakesrand(), fillLaddersrand(), printGameStatsrand();
 void boardrunGames(), boardfillLaddersrand(), boardfillSnakesrand(),boardDice();
-void boardTurnsofDice(),boardnumberofGames(int),boardlogmultiple(int),boardprintGameStats();
+void boardTurnsofDice(),boardnumberofGames(int b),boardlogmultiple(int c),boardprintGameStats();
 void boardSnakesLadders();
 int SnakesLadders();
 int ladderStart[] = { 8,19,21,28,36,43,50,54,61,62,66 };
@@ -85,8 +85,10 @@ main()
 
 	//runGame();
 	//printGameStats();
-	runGames();
-	printGameStatsrand();
+	//runGames();
+	//printGameStatsrand();
+	boardrunGames();
+	boardprintGameStats();
 	printf("hello ramesh\n");
 	getchar();
 }
@@ -267,6 +269,9 @@ void boardrunGames()
 		boardpos[h]=1;
 		boardturnsofdiceforagame[h]=0;
 		boardturnsofgame[h]=0;
+		boardgameturnmultiple[h]=1;
+		boardgametotalmultiple[h]=1;
+
 		for(int i=1;i<101;i++)
 		{
 		boardstates[h][i] = 0;
