@@ -11,7 +11,7 @@ void runGame(), TurnsofDice(), fillLadders(), fillSnakes(), numberofGames(), pri
 void fillSnakesrand(), fillLaddersrand(), printGameStatsrand();
 void boardrunGames(), boardfillLaddersrand(), boardfillSnakesrand(), boardDice();
 void boardTurnsofDice(), boardnumberofGames(int b), boardlogmultiple(int c), boardprintGameStats();
-void boardSnakesLadders();
+void boardSnakesLadders(), boardshuffleSnakesrand(), boardshuffleLaddersrand();
 void commonboardlogmultiple(int c), commonboardprintGameStats(), commonboardrunGames();
 int SnakesLadders();
 int ladderStart[] = { 8,19,21,28,36,43,50,54,61,62,66 };
@@ -35,6 +35,8 @@ int boardturnsofgame[101];
 float boardgameturnmultiple[101][31];
 float boardgametotalmultiple[101][31];
 float commonboardgametotalmultiple[31];
+int snakesshuffled = 0;
+int laddersshuffled = 0;
 int turnsofdiceforagame = 0;
 float turnsasmoney = 100;
 int turnsasmoneytakeninx = 0;
@@ -281,7 +283,7 @@ void boardrunGames()
 		for (int i = 1; i < 31; i++)
 		{
 			//boardgameturnmultiple[h][i] = 1;
-			boardgametotalmultiple[h][i] = 1;
+			boardgametotalmultiple[h][i] = 0.01;
 			if(h<2)commonboardgametotalmultiple[i] = 1;
 		}
 
@@ -301,11 +303,13 @@ void boardrunGames()
 	{
 		boardDice();
 		boardTurnsofDice();
-		for (int h = 1; h<101; h++)
+		for (int h = 1; h < 101; h++)
 		{
-			if (boardpos[h]>100)boardnumberofGames(h);
+			if (boardpos[h] > 100)boardnumberofGames(h);
 			boardSnakesLadders();
 		}
+		boardshuffleSnakesrand();
+		boardshuffleLaddersrand();
 	}
 }
 void boardfillLaddersrand()
@@ -423,9 +427,20 @@ void commonboardlogmultiple(int h)
 			- turnsasmoneytakeninx*(1 + interest)
 			+ ((basispoint / (boardturnsofdiceforagame[h] * 350)))*(turnsasmoneytakeninx + 1);
 		boardgametotalmultiple[h][i] = boardgametotalmultiple[h][i] * gameturnmultiple;
-		commonboardgametotalmultiple[i] = commonboardgametotalmultiple[i]+boardgametotalmultiple[h][i];
-		boardgametotalmultiple[h][i] = commonboardgametotalmultiple[i]/10000;
-		commonboardgametotalmultiple[i] = commonboardgametotalmultiple[i] - boardgametotalmultiple[h][i];
+		if (boardgametotalmultiple[h][i] > (commonboardgametotalmultiple[i] / 3))
+		{
+			commonboardgametotalmultiple[i] = commonboardgametotalmultiple[i] + (boardgametotalmultiple[h][i]/10);
+			boardgametotalmultiple[h][i] = boardgametotalmultiple[h][i] * 0.9;
+		}
+		else if (boardgametotalmultiple[h][i] < (commonboardgametotalmultiple[i] / 3000))
+		{
+			commonboardgametotalmultiple[i] = commonboardgametotalmultiple[i] + boardgametotalmultiple[h][i];
+			boardgametotalmultiple[h][i] = commonboardgametotalmultiple[i] / 1000;
+			commonboardgametotalmultiple[i] = commonboardgametotalmultiple[i] - boardgametotalmultiple[h][i];
+		}
+		//commonboardgametotalmultiple[i] = commonboardgametotalmultiple[i] + boardgametotalmultiple[h][i];
+		//boardgametotalmultiple[h][i] = commonboardgametotalmultiple[i] / 10000;
+		//commonboardgametotalmultiple[i] = commonboardgametotalmultiple[i] - boardgametotalmultiple[h][i];
 		gameturnmultiple = 1;
 	}
 }
@@ -436,15 +451,66 @@ void commonboardprintGameStats()
 			printf(" %.1f ", commonboardgametotalmultiple[i]);
 		}
 		printf("\n");
-		//}
+		printf("snakes shuffled %d ", snakesshuffled);
+		printf("ladders shuffled %d \n", laddersshuffled);
 }
 void commonboardrunGames()
 {
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		boardrunGames();
 		turnsofdice = 0;
 		commonboardprintGameStats();
+	}
+}
+void boardshuffleLaddersrand()
+{
+	for (int h = 1; h<101; h++)
+	{
+		if ((h*1) == (rand() % 1000 + 1))
+		{
+			//printf("shuffling ladders %d ", h);
+			laddersshuffled++;
+			for (int i = 1; i<101; i++)
+			{
+				boardstates[h][i] = 0;
+				boardlIndex[h][i] = 0;
+				boardsIndex[h][i] = 0;
+			}
+			for (int i = 0; i < 11; i++)
+			{
+				if ((rand() % 6) > 2)
+				{
+					boardstates[h][ladderStart[i]] = ladderEnd[i];
+					boardlIndex[h][ladderStart[i]] = i + 1;
+				}
+			}
+		}
+	}
+}
+void boardshuffleSnakesrand()
+{
+	for (int h = 1; h<101; h++)
+	{
+		if ((h*1) == (rand() % 1000 + 1))
+		{
+			//printf("shuffling snakes %d ", h);
+			snakesshuffled++;
+			for (int i = 1; i<101; i++)
+			{
+				boardstates[h][i] = 0;
+				boardlIndex[h][i] = 0;
+				boardsIndex[h][i] = 0;
+			}
+			for (int i = 0; i < 10; i++)
+			{
+				if ((rand() % 6) > 2)
+				{
+					boardstates[h][snakeStart[i]] = snakeEnd[i];
+					boardsIndex[h][snakeStart[i]] = i + 1;
+				}
+			}
+		}
 	}
 }
 
