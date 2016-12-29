@@ -14,7 +14,9 @@ void boardTurnsofDice(), boardnumberofGames(int b), boardlogmultiple(int c), boa
 void boardSnakesLadders(), boardshuffleSnakesrand(), boardshuffleLaddersrand();
 void commonboardlogmultiple(int c), commonboardprintGameStats(), commonboardrunGames();
 void commonboardlogtotalmultiple(), commonboardallocatemultiple(int c, int d);
-void commonboardpreflogmultiple(int c), commonboardprefprintGameStats(), commonboardprefallocatemultiple(int c, int d);
+void commonboardpreflogmultiple(int c), commonboardprefprintGameStats(), commonboardprefallocatemultiple1(int c, int d);
+void commonboardprefallocatemultiple2(int c, int d), boardprefrunGames(), commonboardprefrunGames();
+void commonboardpreflogwholemultiple(), commonboardprefallocatemultiple3(int c, int d);
 int SnakesLadders();
 int ladderStart[] = { 8,19,21,28,36,43,50,54,61,62,66 };
 int ladderEnd[] = { 26,38,82,53,57,77,91,88,99,96,87 };
@@ -39,6 +41,8 @@ float boardgametotalmultiple[101][31];
 float commonboardgametotalmultipleleft[31];
 float commonboardgametotalmultipleadded[31];
 float commonboardgametotalmultipletakenin[101];
+float preflogwholemultiple = 0;
+float preflogwholemultipletaken = 0;
 int snakesshuffled = 0;
 int laddersshuffled = 0;
 int turnsofdiceforagame = 0;
@@ -48,6 +52,7 @@ float interest = 0.006;
 float basispoint = 100;
 float gameturnmultiple = 1;
 float gametotalmultiple = 1;
+float prefgameturnmultiple = 1;
 double loggameturnmultiple = 0;
 double loggametotalmultiple = 0;
 /*	int pos=1,turnsofdice=0,turnsofgame=0;
@@ -99,7 +104,8 @@ main()
 	//printGameStatsrand();
 	//boardrunGames();
 	//boardprintGameStats();
-	commonboardrunGames();
+	//commonboardrunGames();
+	commonboardprefrunGames();
 	printf("hello ramesh\n");
 	getchar();
 }
@@ -404,6 +410,7 @@ void boardnumberofGames(int h)
 	//turnsasmoney = turnsasmoney*(((10000 - basispoint) / 10000) + (basispoint / (turnsofdiceforagame * 350)));
 	//boardlogmultiple(h);
 	//commonboardlogmultiple(h);
+	//commonboardpreflogmultiple(h);
 	commonboardpreflogmultiple(h);
 	boardturnsofdiceforagame[h] = 0;
 	//if(turnsofgame%35==0)numberofdiceturns=numberofdiceturns+100;
@@ -465,7 +472,7 @@ void commonboardprintGameStats()
 }
 void commonboardrunGames()
 {
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		boardrunGames();
 		turnsofdice = 0;
@@ -556,7 +563,7 @@ void commonboardallocatemultiple(int h, int i)
 	}
 	commonboardgametotalmultipleadded[i] = commonboardgametotalmultipleadded[i] + boardgametotalmultiple[h][i];
 }
-void commonboardprefallocatemultiple(int h, int i)
+void commonboardprefallocatemultiple1(int h, int i)
 {
 	//if (boardgametotalmultiple[h][i] > (commonboardgametotalmultipleadded[i]))
 	if (boardgametotalmultiple[h][i] > (commonboardgametotalmultipleleft[i])*5)
@@ -592,20 +599,22 @@ void commonboardprefallocatemultiple(int h, int i)
 void commonboardpreflogmultiple(int h)
 {
 	commonboardgametotalmultipleadded[1] = commonboardgametotalmultipleadded[1] - boardgametotalmultiple[h][1];
+	turnsasmoneytakeninx = 0;
 	//turnsasmoneytakeninx = i - 1;
 	//turnsasmoneytakeninx = commonboardgametotalmultipletakenin[1] / commonboardgametotalmultipleadded[1];
-	turnsasmoneytakeninx = commonboardgametotalmultipletakenin[h];
+	//turnsasmoneytakeninx = commonboardgametotalmultipletakenin[h];
 	//gameturnmultiple = ((10000 - basispoint) / 10000) - (turnsasmoneytakeninx*(1 + interest)) + (basispoint / (boardturnsofdiceforagame[h] * 350));
 	//turnsasmoneytakeninx = turnsasmoneytakeninx + (commonboardgametotalmultipletakenin[i]/commonboardgametotalmultipleadded[i]);
 	gameturnmultiple = ((10000 - basispoint) / 10000)*(turnsasmoneytakeninx + 1)
 		- turnsasmoneytakeninx*(1 + interest)
 		+ ((basispoint / (boardturnsofdiceforagame[h] * 350)))*(turnsasmoneytakeninx + 1);
 	boardgametotalmultiple[h][1] = boardgametotalmultiple[h][1] * gameturnmultiple;
-	commonboardprefallocatemultiple(h, 1);
+	commonboardprefallocatemultiple1(h, 1);
 	gameturnmultiple = 1;
 }
 void commonboardprefprintGameStats()
 {
+	printf(" %.1f ", prefgameturnmultiple);
 	printf(" %.1f ", commonboardgametotalmultipleadded[1]);
 	printf("\n");
 	printf(" %.1f ", commonboardgametotalmultipleleft[1]);
@@ -618,4 +627,150 @@ void commonboardprefprintGameStats()
 	printf("snakes shuffled %d ", snakesshuffled);
 	printf("ladders shuffled %d \n", laddersshuffled);
 	printf("\n");
+}
+void commonboardprefallocatemultiple2(int h, int i)
+{
+	//if (boardgametotalmultiple[h][i] > (commonboardgametotalmultipleadded[i]))
+	if (boardgametotalmultiple[h][i] > (commonboardgametotalmultipleleft[i]))
+	{
+		commonboardgametotalmultipleleft[i] = commonboardgametotalmultipleleft[i] + (boardgametotalmultiple[h][i] / 10);
+		boardgametotalmultiple[h][i] = boardgametotalmultiple[h][i] * 0.9;
+		if (commonboardgametotalmultipletakenin[h]<0.25)
+		commonboardgametotalmultipletakenin[h] = commonboardgametotalmultipletakenin[h] + 0.1;
+	}
+	else if (boardgametotalmultiple[h][i] > (commonboardgametotalmultipleadded[i] / 80))
+	{
+		if (boardgametotalmultiple[h][i] < commonboardgametotalmultipleleft[i] * 2)
+		{
+			//commonboardgametotalmultipletakenin[h] = commonboardgametotalmultipletakenin[h] + 0.25;
+			commonboardgametotalmultipleleft[i] = commonboardgametotalmultipleleft[i] - (boardgametotalmultiple[h][i] / 2);
+			boardgametotalmultiple[h][i] = boardgametotalmultiple[h][i] * 1.5;
+			//if (commonboardgametotalmultipletakenin[h]<0.25)
+			//commonboardgametotalmultipletakenin[h] = commonboardgametotalmultipletakenin[h] + 0.1;
+		}
+		else if (commonboardgametotalmultipletakenin[h]<0.25)
+			commonboardgametotalmultipletakenin[h] = commonboardgametotalmultipletakenin[h] + 0.1;
+		//{
+		//commonboardgametotalmultipleleft[i] = commonboardgametotalmultipleleft[i] - (boardgametotalmultiple[h][i] / 4);
+		//boardgametotalmultiple[h][i] = boardgametotalmultiple[h][i] * 1.25;
+		//}
+	}
+	else if (boardgametotalmultiple[h][i] < (commonboardgametotalmultipleadded[i] / 3000))
+	{
+		commonboardgametotalmultipleleft[i] = commonboardgametotalmultipleleft[i] + boardgametotalmultiple[h][i];
+		boardgametotalmultiple[h][i] = commonboardgametotalmultipleleft[i] / 1000;
+		commonboardgametotalmultipleleft[i] = commonboardgametotalmultipleleft[i] - boardgametotalmultiple[h][i];
+	}
+	commonboardgametotalmultipleadded[i] = commonboardgametotalmultipleadded[i] + boardgametotalmultiple[h][i];
+}
+void boardprefrunGames()
+{
+	gameturnmultiple = 1;
+	turnsasmoneytakeninx = 0;
+	for (int h = 1; h<101; h++)
+	{
+		boardpos[h] = 1;
+		boardturnsofdiceforagame[h] = 0;
+		boardturnsofgame[h] = 0;
+		//boardgameturnmultiple[h] = 1;
+		//boardgametotalmultiple[h] = 1;
+		commonboardgametotalmultipletakenin[h] = 0;
+		for (int i = 1; i < 31; i++)
+		{
+			//boardgameturnmultiple[h][i] = 1;
+			boardgametotalmultiple[h][i] = 0.01;
+			if (h<2)commonboardgametotalmultipleleft[i] = 1;
+			if (h<2)commonboardgametotalmultipleadded[i] = 1;
+		}
+
+		for (int i = 1; i<101; i++)
+		{
+			boardstates[h][i] = 0;
+			boardlIndex[h][i] = 0;
+			boardsIndex[h][i] = 0;
+		}
+
+		for (int i = 1; i < 12; i++)boardladderHit[h][i] = 0;
+		for (int i = 1; i < 11; i++)boardsnakeHit[h][i] = 0;
+	}
+	boardfillLaddersrand();
+	boardfillSnakesrand();
+	while (turnsofdice<numberofdiceturns)
+	{
+		boardDice();
+		boardTurnsofDice();
+		for (int h = 1; h < 101; h++)
+		{
+			if (boardpos[h] > 100)boardnumberofGames(h);
+			boardSnakesLadders();
+		}
+		boardshuffleSnakesrand();
+		boardshuffleLaddersrand();
+		//commonboardpreflogwholemultiple();
+	}
+	commonboardlogtotalmultiple();
+}
+void commonboardprefrunGames()
+{
+	for (int i = 0; i < 3; i++)
+	{
+		boardprefrunGames();
+		turnsofdice = 0;
+		//commonboardprintGameStats();
+		commonboardprefprintGameStats();
+	}
+}
+void commonboardpreflogwholemultiple()
+{
+	for (int h = 1; h < 101; h++)
+	{
+		preflogwholemultipletaken = preflogwholemultipletaken + commonboardgametotalmultipletakenin[h];
+	}
+	prefgameturnmultiple = commonboardgametotalmultipleadded[1] + commonboardgametotalmultipleleft[1] 
+		- preflogwholemultipletaken*(1 + interest);
+	for (int h = 1; h < 101; h++)
+	{
+		boardgametotalmultiple[h][1] = (boardgametotalmultiple[h][1]* prefgameturnmultiple)/ commonboardgametotalmultipleadded[1];
+	}
+	commonboardgametotalmultipleleft[1] = (commonboardgametotalmultipleleft[1] * prefgameturnmultiple) / commonboardgametotalmultipleadded[1];
+	commonboardgametotalmultipleadded[1] = prefgameturnmultiple - commonboardgametotalmultipleleft[1];
+}
+void commonboardprefallocatemultiple3(int h, int i)
+{
+	//if (boardgametotalmultiple[h][i] > (commonboardgametotalmultipleadded[i]))
+	if (boardgametotalmultiple[h][i] > (commonboardgametotalmultipleleft[i]))
+	{
+		commonboardgametotalmultipleleft[i] = commonboardgametotalmultipleleft[i] + (boardgametotalmultiple[h][i] / 10);
+		boardgametotalmultiple[h][i] = boardgametotalmultiple[h][i] * 0.9;
+		//if (commonboardgametotalmultipletakenin[h]<0.25)
+		commonboardgametotalmultipletakenin[h] = commonboardgametotalmultipletakenin[h] + boardgametotalmultiple[h][i]/2;
+		boardgametotalmultiple[h][i] = boardgametotalmultiple[h][i] * 1.5;
+	}
+	else if (boardgametotalmultiple[h][i] > (commonboardgametotalmultipleadded[i] / 80))
+	{
+		if (boardgametotalmultiple[h][i] < commonboardgametotalmultipleleft[i] * 2)
+		{
+			//commonboardgametotalmultipletakenin[h] = commonboardgametotalmultipletakenin[h] + 0.25;
+			commonboardgametotalmultipleleft[i] = commonboardgametotalmultipleleft[i] - (boardgametotalmultiple[h][i] / 2);
+			boardgametotalmultiple[h][i] = boardgametotalmultiple[h][i] * 1.5;
+			//if (commonboardgametotalmultipletakenin[h]<0.25)
+			//commonboardgametotalmultipletakenin[h] = commonboardgametotalmultipletakenin[h] + 0.1;
+		}
+		else
+		{
+			commonboardgametotalmultipletakenin[h] = commonboardgametotalmultipletakenin[h] + boardgametotalmultiple[h][i] / 2;
+			boardgametotalmultiple[h][i] = boardgametotalmultiple[h][i] * 1.5;
+		}
+		//{
+		//commonboardgametotalmultipleleft[i] = commonboardgametotalmultipleleft[i] - (boardgametotalmultiple[h][i] / 4);
+		//boardgametotalmultiple[h][i] = boardgametotalmultiple[h][i] * 1.25;
+		//}
+	}
+	else if (boardgametotalmultiple[h][i] < (commonboardgametotalmultipleadded[i] / 3000))
+	{
+		commonboardgametotalmultipleleft[i] = commonboardgametotalmultipleleft[i] + boardgametotalmultiple[h][i];
+		boardgametotalmultiple[h][i] = commonboardgametotalmultipleleft[i] / 1000;
+		commonboardgametotalmultipleleft[i] = commonboardgametotalmultipleleft[i] - boardgametotalmultiple[h][i];
+	}
+	commonboardgametotalmultipleadded[i] = commonboardgametotalmultipleadded[i] + boardgametotalmultiple[h][i];
 }
