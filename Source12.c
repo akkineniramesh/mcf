@@ -19,6 +19,8 @@ void prefcommonboardallocatemultiple2(int c, int d), prefboardrunGames1(), prefc
 void prefcommonboardlogwholemultiple(), prefcommonboardallocatemultiple3(int c, int d);
 void prefcommonboardlogmultiple2(int c), boardnumberofGames2(int b), prefcommonboardlogtotalmultiple();
 void prefcommonboardprintGameStats2(), prefcommonboardrunGames2(), prefboardrunGames2();
+void prefboardfillLaddersrand(), prefboardfillSnakesrand();
+void prefboardshuffleSnakesrand(), prefboardshuffleLaddersrand();
 int SnakesLadders();
 int ladderStart[] = { 8,19,21,28,36,43,50,54,61,62,66 };
 int ladderEnd[] = { 26,38,82,53,57,77,91,88,99,96,87 };
@@ -54,6 +56,7 @@ int turnsofdiceforagame = 0;
 float turnsasmoney = 100;
 int turnsasmoneytakeninx = 0;
 float interest = 0.006;
+float prefinterest = 0.006;
 float basispoint = 100;
 float gameturnmultiple = 1;
 float gametotalmultiple = 1;
@@ -735,7 +738,7 @@ void prefcommonboardrunGames1()
 void prefcommonboardlogwholemultiple()
 {
 	logprefgamewholemultiple = logprefwholemultipleadded + logprefwholemultipleleft
-		- logprefwholemultipletaken*(1 + interest);
+		- logprefwholemultipletaken*(1 + prefinterest);
 	if (turnsofdice % 3000 == 0)
 		printf("logprefwholemultipletaken %.f", logprefwholemultipletaken);
 	logprefwholemultipletaken = 0;
@@ -760,10 +763,9 @@ void prefcommonboardallocatemultiple3(int h, int i)
 	{
 		if (prefboardgametotalmultiple[h] < logprefwholemultipleleft * 2)
 		{
-			//commonboardgametotalmultipletakenin[h] = commonboardgametotalmultipletakenin[h] + 0.25;
 			logprefwholemultipleleft = logprefwholemultipleleft - (prefboardgametotalmultiple[h] / 2);
-			//logprefwholemultipletaken = logprefwholemultipletaken + prefboardgametotalmultiple[h]/20;
-			prefboardgametotalmultiple[h] = prefboardgametotalmultiple[h] * 1.5;
+			logprefwholemultipletaken = logprefwholemultipletaken + prefboardgametotalmultiple[h]/20;
+			prefboardgametotalmultiple[h] = prefboardgametotalmultiple[h] * 1.55;
 		}
 		else
 		{
@@ -822,7 +824,7 @@ void prefcommonboardprintGameStats2()
 }
 void prefcommonboardrunGames2()
 {
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		prefboardrunGames2();
 		turnsofdice = 0;
@@ -854,8 +856,8 @@ void prefboardrunGames2()
 		for (int i = 1; i < 12; i++)boardladderHit[h][i] = 0;
 		for (int i = 1; i < 11; i++)boardsnakeHit[h][i] = 0;
 	}
-	boardfillLaddersrand();
-	boardfillSnakesrand();
+	prefboardfillLaddersrand();
+	prefboardfillSnakesrand();
 	while (turnsofdice<numberofdiceturns)
 	{
 		boardDice();
@@ -865,10 +867,88 @@ void prefboardrunGames2()
 			if (boardpos[h] > 100)boardnumberofGames2(h);
 			boardSnakesLadders();
 		}
-		boardshuffleSnakesrand();
-		boardshuffleLaddersrand();
+		prefboardshuffleSnakesrand();
+		prefboardshuffleLaddersrand();
 		if (turnsofdice % 30 == 0)
 			prefcommonboardlogwholemultiple();
 	}
 	prefcommonboardlogtotalmultiple();
+}
+void prefboardfillLaddersrand()
+{
+	for (int h = 1; h<101; h++)
+	{
+		for (int i = 0; i<11; i++)
+		{
+			if ((rand() % 6) > 2)
+			{
+				boardstates[h][ladderStart[i]] = ladderEnd[i];
+				boardlIndex[h][ladderStart[i]] = i + 1;
+			}
+		}
+	}
+}
+void prefboardfillSnakesrand()
+{
+	for (int h = 1; h<101; h++)
+	{
+		for (int i = 0; i<10; i++)
+		{
+			if ((rand() % 6) > 2)
+			{
+				boardstates[h][snakeStart[i]] = snakeEnd[i];
+				boardsIndex[h][snakeStart[i]] = i + 1;
+			}
+		}
+	}
+}
+void prefboardshuffleLaddersrand()
+{
+	for (int h = 1; h<101; h++)
+	{
+		if ((h * 1) == (rand() % 100 + 1))
+		{
+			//printf("shuffling ladders %d ", h);
+			laddersshuffled++;
+			for (int i = 1; i<101; i++)
+			{
+				boardstates[h][i] = 0;
+				boardlIndex[h][i] = 0;
+				boardsIndex[h][i] = 0;
+			}
+			for (int i = 0; i < 11; i++)
+			{
+				if ((rand() % 6) > 2)
+				{
+					boardstates[h][ladderStart[i]] = ladderEnd[i];
+					boardlIndex[h][ladderStart[i]] = i + 1;
+				}
+			}
+		}
+	}
+}
+void prefboardshuffleSnakesrand()
+{
+	for (int h = 1; h<101; h++)
+	{
+		if ((h * 1) == (rand() % 100 + 1))
+		{
+			//printf("shuffling snakes %d ", h);
+			snakesshuffled++;
+			for (int i = 1; i<101; i++)
+			{
+				boardstates[h][i] = 0;
+				boardlIndex[h][i] = 0;
+				boardsIndex[h][i] = 0;
+			}
+			for (int i = 0; i < 10; i++)
+			{
+				if ((rand() % 6) > 2)
+				{
+					boardstates[h][snakeStart[i]] = snakeEnd[i];
+					boardsIndex[h][snakeStart[i]] = i + 1;
+				}
+			}
+		}
+	}
 }
