@@ -16,11 +16,14 @@ void commonboardlogmultiple(int c), commonboardprintGameStats(), commonboardrunG
 void commonboardlogtotalmultiple(), commonboardallocatemultiple(int c, int d);
 void prefcommonboardlogmultiple1(int c), prefcommonboardprintGameStats1(), prefcommonboardallocatemultiple1(int c, int d);
 void prefcommonboardallocatemultiple2(int c, int d), prefboardrunGames1(), prefcommonboardrunGames1();
-void prefcommonboardlogwholemultiple(), prefcommonboardallocatemultiple3(int c, int d);
+void prefcommonboardlogwholemultiple1(), prefcommonboardallocatemultiple3(int c, int d);
 void prefcommonboardlogmultiple2(int c), boardnumberofGames2(int b), prefcommonboardlogtotalmultiple();
 void prefcommonboardprintGameStats2(), prefcommonboardrunGames2(), prefboardrunGames2();
 void prefboardfillLaddersrand(), prefboardfillSnakesrand();
 void prefboardshuffleSnakesrand(), prefboardshuffleLaddersrand();
+void prefcommonboardlogwholemultiple0();
+void prefcommonboardlogwholemultiple2();
+void prefcommonboardprintGameStats3();
 int SnakesLadders();
 int ladderStart[] = { 8,19,21,28,36,43,50,54,61,62,66 };
 int ladderEnd[] = { 26,38,82,53,57,77,91,88,99,96,87 };
@@ -618,7 +621,7 @@ void prefcommonboardlogmultiple1(int h)
 		- turnsasmoneytakeninx*(1 + interest)
 		+ ((basispoint / (boardturnsofdiceforagame[h] * 350)))*(turnsasmoneytakeninx + 1);
 	boardgametotalmultiple[h][1] = boardgametotalmultiple[h][1] * gameturnmultiple;
-	prefcommonboardallocatemultiple2(h, 1);
+	prefcommonboardallocatemultiple1(h, 1);
 	gameturnmultiple = 1;
 }
 void prefcommonboardprintGameStats1()
@@ -644,21 +647,22 @@ void prefcommonboardallocatemultiple2(int h, int i)
 	{
 		commonboardgametotalmultipleleft[i] = commonboardgametotalmultipleleft[i] + (boardgametotalmultiple[h][i] / 10);
 		boardgametotalmultiple[h][i] = boardgametotalmultiple[h][i] * 0.9;
-		if (commonboardgametotalmultipletakenin[h]<0.25)
-			commonboardgametotalmultipletakenin[h] = commonboardgametotalmultipletakenin[h] + 0.1;
+		//if (commonboardgametotalmultipletakenin[h]<0.25)
+			//commonboardgametotalmultipletakenin[h] = commonboardgametotalmultipletakenin[h] + 0.1;
 	}
 	else if (boardgametotalmultiple[h][i] > (commonboardgametotalmultipleadded[i] / 80))
 	{
 		if (boardgametotalmultiple[h][i] < commonboardgametotalmultipleleft[i] * 2)
 		{
-			//commonboardgametotalmultipletakenin[h] = commonboardgametotalmultipletakenin[h] + 0.25;
+			//commonboardgametotalmultipletakenin[h] = commonboardgametotalmultipletakenin[h] + boardgametotalmultiple[h][i]/20;
+			//logprefwholemultipletaken = logprefwholemultipletaken + boardgametotalmultiple[h][i] / 20;
 			commonboardgametotalmultipleleft[i] = commonboardgametotalmultipleleft[i] - (boardgametotalmultiple[h][i] / 2);
 			boardgametotalmultiple[h][i] = boardgametotalmultiple[h][i] * 1.5;
 			//if (commonboardgametotalmultipletakenin[h]<0.25)
 			//commonboardgametotalmultipletakenin[h] = commonboardgametotalmultipletakenin[h] + 0.1;
 		}
-		else if (commonboardgametotalmultipletakenin[h]<0.25)
-			commonboardgametotalmultipletakenin[h] = commonboardgametotalmultipletakenin[h] + 0.1;
+		//else if (commonboardgametotalmultipletakenin[h]<0.25)
+			//commonboardgametotalmultipletakenin[h] = commonboardgametotalmultipletakenin[h] + 0.1;
 		//{
 		//commonboardgametotalmultipleleft[i] = commonboardgametotalmultipleleft[i] - (boardgametotalmultiple[h][i] / 4);
 		//boardgametotalmultiple[h][i] = boardgametotalmultiple[h][i] * 1.25;
@@ -721,7 +725,7 @@ void prefboardrunGames1()
 		boardshuffleSnakesrand();
 		boardshuffleLaddersrand();
 		if (turnsofdice % 30 == 0)
-			prefcommonboardlogwholemultiple();
+			prefcommonboardlogwholemultiple1();
 	}
 	prefcommonboardlogtotalmultiple();
 }
@@ -735,7 +739,22 @@ void prefcommonboardrunGames1()
 		prefcommonboardprintGameStats1();
 	}
 }
-void prefcommonboardlogwholemultiple()
+void prefcommonboardlogwholemultiple0()
+{
+	logprefgamewholemultiple = commonboardgametotalmultipleadded[1] + commonboardgametotalmultipleleft[1]
+		- logprefwholemultipletaken*(1 + interest);
+	if (turnsofdice % 3000 == 0)
+		printf("logprefwholemultipletaken %.f", logprefwholemultipletaken);
+	logprefwholemultipletaken = 0;
+	float ratio = logprefgamewholemultiple / (commonboardgametotalmultipleadded[1] + commonboardgametotalmultipleleft[1]);
+	for (int h = 1; h < 101; h++)
+	{
+		boardgametotalmultiple[h][1] = boardgametotalmultiple[h][1] * ratio;
+	}
+	commonboardgametotalmultipleleft[1] = commonboardgametotalmultipleleft[1] * ratio;
+	commonboardgametotalmultipleadded[1] = logprefgamewholemultiple - commonboardgametotalmultipleleft[1];
+}
+void prefcommonboardlogwholemultiple1()
 {
 	logprefgamewholemultiple = logprefwholemultipleadded + logprefwholemultipleleft
 		- logprefwholemultipletaken*(1 + prefinterest);
@@ -764,8 +783,8 @@ void prefcommonboardallocatemultiple3(int h, int i)
 		if (prefboardgametotalmultiple[h] < logprefwholemultipleleft * 2)
 		{
 			logprefwholemultipleleft = logprefwholemultipleleft - (prefboardgametotalmultiple[h] / 2);
-			logprefwholemultipletaken = logprefwholemultipletaken + prefboardgametotalmultiple[h]/20;
-			prefboardgametotalmultiple[h] = prefboardgametotalmultiple[h] * 1.55;
+			//logprefwholemultipletaken = logprefwholemultipletaken + prefboardgametotalmultiple[h]/20;
+			prefboardgametotalmultiple[h] = prefboardgametotalmultiple[h] * 1.5;
 		}
 		else
 		{
@@ -824,7 +843,7 @@ void prefcommonboardprintGameStats2()
 }
 void prefcommonboardrunGames2()
 {
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 1; i++)
 	{
 		prefboardrunGames2();
 		turnsofdice = 0;
@@ -870,7 +889,9 @@ void prefboardrunGames2()
 		prefboardshuffleSnakesrand();
 		prefboardshuffleLaddersrand();
 		if (turnsofdice % 30 == 0)
-			prefcommonboardlogwholemultiple();
+			prefcommonboardlogwholemultiple2();
+		if (turnsofdice % 3000 == 0)
+			prefcommonboardprintGameStats3();
 	}
 	prefcommonboardlogtotalmultiple();
 }
@@ -951,4 +972,28 @@ void prefboardshuffleSnakesrand()
 			}
 		}
 	}
+}
+void prefcommonboardlogwholemultiple2()
+{
+	logprefgamewholemultiple = logprefwholemultipleadded + logprefwholemultipleleft
+		- logprefwholemultipletaken*(1 + prefinterest);
+	if (turnsofdice % 3000 == 0)
+		printf("logprefwholemultipletaken %.f", logprefwholemultipletaken);
+	logprefwholemultipletaken = 0;
+	float ratio = logprefgamewholemultiple / (logprefwholemultipleadded + logprefwholemultipleleft);
+	for (int h = 1; h < 101; h++)
+	{
+		prefboardgametotalmultiple[h] = prefboardgametotalmultiple[h] * ratio;
+	}
+	logprefwholemultipleleft = logprefwholemultipleleft * ratio;
+	logprefwholemultipleadded = logprefgamewholemultiple - logprefwholemultipleleft;
+}
+void prefcommonboardprintGameStats3()
+{
+	printf(" %.1f ", logprefgamewholemultiple);
+	printf("\n");
+	printf(" %.1f ", logprefwholemultipleadded);
+	printf(" %.1f ", logprefwholemultipleleft);
+	printf("\n");
+	printf("\n");
 }
