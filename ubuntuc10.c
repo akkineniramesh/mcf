@@ -71,6 +71,24 @@ float gametotalmultiple = 1;
 float logprefgamewholemultiple = 1;
 double loggameturnmultiple = 0;
 double loggametotalmultiple = 0;
+struct gamestate prefgamestate;
+struct gamestate
+{
+	float logprefgamewholemultiple;
+	float logprefwholemultipletaken;
+	float logprefwholemultipleadded;
+	float logprefwholemultipleleft;
+	int boardpos[numberofboards];
+	int boardturnsofdiceforagame[numberofboards];
+	int boardturnsofgame[numberofboards];
+	int boardstates[numberofboards][boardsize];
+	int boardlIndex[numberofboards][boardsize];
+	int boardsIndex[numberofboards][boardsize];
+	int boardladderHit[numberofboards][12];
+	int boardsnakeHit[numberofboards][11];
+	float prefboardgametotalmultiple[numberofboards];
+};
+
 /*	int pos=1,turnsofdice=0,turnsofgame=0;
 int a[]=new int[101];
 int ladderStart[]={8,19,21,28,36,43,50,54,61,62,66};
@@ -848,11 +866,14 @@ void prefcommonboardprintGameStats2()
 }
 void prefcommonboardrunGames2()
 {
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 1; i++)
 	{
 		prefboardrunGames2();
+		//struct gamestate prefgamestate1 = gamestatestruct();
+		prefgamestate = gamestatestruct();
+		printf("%.1f",prefgamestate.logprefgamewholemultiple);
 		turnsofdice = 0;
-		prefcommonboardprintGameStats3();
+		//prefcommonboardprintGameStats3();
 	}
 }
 void prefboardrunGames2()
@@ -1005,23 +1026,7 @@ void prefboardshuffleSnakesLaddersrand()
 		}
 	}
 }
-struct gamestate
-{
-	float logprefgamewholemultiple;
-	float logprefwholemultipletaken;
-	float logprefwholemultipleadded;
-	float logprefwholemultipleleft;
-	int boardpos[numberofboards];
-	int boardturnsofdiceforagame[numberofboards];
-	int boardturnsofgame[numberofboards];
-	int boardstates[numberofboards][boardsize];
-	int boardlIndex[numberofboards][boardsize];
-	int boardsIndex[numberofboards][boardsize];
-	int boardladderHit[numberofboards][12];
-	int boardsnakeHit[numberofboards][11];
-	float prefboardgametotalmultiple[numberofboards];
-};
-struct gamestate prefgamestate;
+
 struct gamestate gamestatestruct()
 {
 	struct gamestate p;
@@ -1044,4 +1049,5 @@ struct gamestate gamestatestruct()
 		for (int i = 1; i < 12; i++)p.boardladderHit[h][i] = boardladderHit[h][i];
 		for (int i = 1; i < 11; i++)p.boardsnakeHit[h][i] = boardsnakeHit[h][i];
 	}
+	return p;
 }
