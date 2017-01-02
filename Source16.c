@@ -4,6 +4,7 @@
 
 #define numberofboards 201
 #define boardsize 101
+#define numberofparts 101
 int multiply(int m1, int m2);
 int Dice(int pos);
 int pos = 1, turnsofdice = 0, turnsofgame = 0;
@@ -18,7 +19,7 @@ void commonboardlogmultiple(int c), commonboardprintGameStats(), commonboardrunG
 void commonboardlogtotalmultiple(), commonboardallocatemultiple(int c, int d);
 void prefcommonboardlogmultiple1(int c), prefcommonboardprintGameStats1(), prefcommonboardallocatemultiple1(int c, int d);
 void prefcommonboardallocatemultiple2(int c, int d), prefboardrunGames1(), prefcommonboardrunGames1();
-void prefcommonboardlogwholemultiple1(), prefcommonboardallocatemultiple3(int c, int d);
+void prefcommonboardlogwholemultiple1(), prefcommonboardallocatemultiple3(int c);
 void prefcommonboardlogmultiple2(int c), boardnumberofGames2(int b), prefcommonboardlogtotalmultiple();
 void prefcommonboardprintGameStats2(), prefcommonboardrunGames2(), prefboardrunGames2();
 void prefboardfillLaddersrand(int h), prefboardfillSnakesrand(int h);
@@ -772,7 +773,7 @@ void prefcommonboardlogwholemultiple1()
 	logprefwholemultipleleft = logprefwholemultipleleft * ratio;
 	logprefwholemultipleadded = logprefgamewholemultiple - logprefwholemultipleleft;
 }
-void prefcommonboardallocatemultiple3(int h, int i)
+void prefcommonboardallocatemultiple3(int h)
 {
 	if (prefboardgametotalmultiple[h] >(logprefwholemultipleleft) * 10)
 	{
@@ -811,7 +812,7 @@ void prefcommonboardlogmultiple2(int h)
 		- turnsasmoneytakeninx*(1 + interest)
 		+ ((basispoint / (boardturnsofdiceforagame[h] * 350)))*(turnsasmoneytakeninx + 1);
 	prefboardgametotalmultiple[h] = prefboardgametotalmultiple[h] * gameturnmultiple;
-	prefcommonboardallocatemultiple3(h, 1);
+	prefcommonboardallocatemultiple3(h);
 	gameturnmultiple = 1;
 }
 void boardnumberofGames2(int h)
@@ -987,7 +988,8 @@ void prefboardshuffleSnakesLaddersrand()
 {
 	for (int h = 1; h<numberofboards; h++)
 	{
-		if ((h * 1) == (rand() % numberofboards / 2) + 1)
+		int k = (rand() % numberofparts) + 1;
+		if ((h * 1) == (rand() % numberofboards / k) + 1)
 		{
 			//printf("shuffling snakes %d ", h);
 			snakesshuffled++;
