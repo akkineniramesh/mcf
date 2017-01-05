@@ -82,6 +82,7 @@ struct gamestate
 	float gameprefinterest;
 	int numberofgameboards;
 	int gameboardsize;
+	int gamenumberofparts;
 	int boardpos[numberofboards];
 	int boardturnsofdiceforagame[numberofboards];
 	int boardturnsofgame[numberofboards];
@@ -94,7 +95,8 @@ struct gamestate
 };
 struct gamestate prefgamestate, p;
 struct gamestate *gamestatestruct();
-void writegamestate();
+void writegamestate(struct gamestate *p1);
+char *writegamestatestr(struct gamestate *p1);
 void printtime();
 /*	int pos=1,turnsofdice=0,turnsofgame=0;
 int a[]=new int[101];
@@ -139,7 +141,7 @@ main()
 	srand(time(NULL));
 	printf("Random number: %d \n", rand() % 10000);
 	//writegamestate();
-	printtime();
+	//printtime();
 	//runGame();
 	//printGameStats();
 	//runGames();
@@ -148,7 +150,7 @@ main()
 	//boardprintGameStats();
 	//commonboardrunGames();
 	//prefcommonboardrunGames1();
-	//prefcommonboardrunGames2();
+	prefcommonboardrunGames2();
 	printf("hello ramesh\n");
 	getchar();
 }
@@ -874,12 +876,16 @@ void prefcommonboardprintGameStats2()
 }
 void prefcommonboardrunGames2()
 {
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 1; i++)
 	{
 		prefboardrunGames2();
 		//struct gamestate prefgamestate1 = gamestatestruct();
 		struct gamestate *prefgamestate1 = gamestatestruct();
-		printf("%.1f \n", prefgamestate1->logprefgamewholemultiple);
+		//writegamestate(prefgamestate1);
+		char *s1 = writegamestatestr(prefgamestate1);
+		//printf("%s",(*writegamestatestr(prefgamestate1)));
+		//fflush(stdout);
+		//printf("%.1f \n", prefgamestate1->logprefgamewholemultiple);
 		turnsofdice = 0;
 		//prefcommonboardprintGameStats3();
 	}
@@ -1040,6 +1046,7 @@ struct gamestate *gamestatestruct()
 	//struct gamestate p;
 	p.numberofgameboards = numberofboards;
 	p.gameboardsize = boardsize;
+	p.gamenumberofparts = numberofparts;
 	p.gameprefinterest = prefinterest;
 	p.logprefgamewholemultiple = logprefgamewholemultiple;
 	p.logprefwholemultipletaken = logprefwholemultipletaken;
@@ -1062,11 +1069,35 @@ struct gamestate *gamestatestruct()
 	}
 	return &p;
 }
-void writegamestate()
+void writegamestate(struct gamestate *p1)
 {
 	FILE *fp;
 	fp = fopen("C:/Users/Admin/Downloads/snakes-and-ladders/write.txt", "w");
-	fprintf(fp, "sample string \n");
+	//fp = fopen("/home/ramesh/code/snakes-and-ladders/write.txt", "w");
+	//fprintf(fp, "sample string \n");
+	fprintf(fp, "numberofgameboards = %d \n", p1->numberofgameboards);
+	fprintf(fp, "gameboardsize = %d \n", p1->gameboardsize);
+	fprintf(fp, "gamenumberofparts = %d \n", p1->gamenumberofparts);
+	fprintf(fp, "gameprefinterest = %f \n", p1->gameprefinterest);
+	fprintf(fp, "logprefgamewholemultiple = %.1f \n", p1->logprefgamewholemultiple);
+	fprintf(fp, "logprefwholemultipletaken = %.1f \n", p1->logprefwholemultipletaken);
+	fprintf(fp, "logprefwholemultipleadded = %.1f \n", p1->logprefwholemultipleadded);
+	fprintf(fp, "logprefwholemultipleleft = %.1f \n", p1->logprefwholemultipleleft);
+	for (int h = 1; h<p1->numberofgameboards; h++)
+	{
+		//fprintf(fp, "boardpos[%d] = %d \n" ,h, p1->boardpos[h]);
+		//fprintf(fp, "boardturnsofdiceforagame[%d] = %d \n" ,h, p1->boardturnsofdiceforagame[h]);
+		//fprintf(fp, "boardturnsofgame[%d] = %d \n" ,h, p1->boardturnsofgame[h]);
+		fprintf(fp, "prefboardgametotalmultiple[%d] = %.1f \n", h, p1->prefboardgametotalmultiple[h]);
+		for (int i = 1; i<boardsize; i++)
+		{
+			//p.boardstates[h][i] = boardstates[h][i];
+			//p.boardlIndex[h][i] = boardlIndex[h][i];
+			//p.boardsIndex[h][i] = boardsIndex[h][i];
+		}
+		//for (int i = 1; i < 12; i++)//p.boardladderHit[h][i] = boardladderHit[h][i];
+		//for (int i = 1; i < 11; i++)//p.boardsnakeHit[h][i] = boardsnakeHit[h][i];
+	}
 	fclose(fp);
 }
 void printtime()
@@ -1083,4 +1114,10 @@ void printtime()
 	//strftime(s, sizeof(s), "%c", tm1);
 	//printf("%s\n", s);
 	printf("now: %d-%d-%d %d:%d:%d\n", tm1->tm_year + 1900, tm1->tm_mon + 1, tm1->tm_mday, tm1->tm_hour, tm1->tm_min, tm1->tm_sec);
+}
+char *writegamestatestr(struct gamestate *p1)
+{
+	char *s1 = "";
+	sprintf(s1, "%f", p1->logprefgamewholemultiple);
+	return s1;
 }
