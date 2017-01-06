@@ -364,8 +364,8 @@ void boardrunGames()
 		for (int h = 1; h < 101; h++)
 		{
 			if (boardpos[h] > 100)boardnumberofGames1(h);
-			boardSnakesLadders();
 		}
+		boardSnakesLadders();
 		boardshuffleSnakesrand();
 		boardshuffleLaddersrand();
 	}
@@ -754,8 +754,8 @@ void prefboardrunGames1()
 		for (int h = 1; h < 101; h++)
 		{
 			if (boardpos[h] > 100)boardnumberofGames2(h);
-			boardSnakesLadders();
 		}
+		boardSnakesLadders();
 		boardshuffleSnakesrand();
 		boardshuffleLaddersrand();
 		if (turnsofdice % 30 == 0)
@@ -928,8 +928,8 @@ void prefboardrunGames2()
 		for (int h = 1; h < numberofboards; h++)
 		{
 			if (boardpos[h] > boardsize - 1)boardnumberofGames2(h);
-			boardSnakesLadders();
 		}
+		boardSnakesLadders();
 		prefboardshuffleSnakesLaddersrand();
 		//prefboardshuffleSnakesrand();
 		//prefboardshuffleLaddersrand();
