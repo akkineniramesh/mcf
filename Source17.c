@@ -4,7 +4,7 @@
 #include <time.h>
 #include <string.h>
 
-#define numberofboards 201
+#define numberofboards 101
 #define boardsize 101
 #define numberofparts 101
 int multiply(int m1, int m2);
@@ -14,10 +14,11 @@ int states[101];
 long numberofdiceturns = 100000;
 void runGame(), TurnsofDice(), fillLadders(), fillSnakes(), numberofGames(), printGameStats(), logmultiple(), runGames();
 void fillSnakesrand(), fillLaddersrand(), printGameStatsrand();
-void boardrunGames(), boardfillLaddersrand(), boardfillSnakesrand(), boardDice();
+void boardrunGame(), boardrunGames(), boardfillLaddersrand(int h), boardfillSnakesrand(int h), boardDice();
 void boardTurnsofDice(), boardnumberofGames1(int b), boardlogmultiple(int c), boardprintGameStats();
-void boardSnakesLadders(), boardshuffleSnakesrand(), boardshuffleLaddersrand();
-void commonboardlogmultiple(int c), commonboardprintGameStats(), commonboardrunGames();
+void boardSnakesLadders(), boardshuffleSnakesLaddersrand();
+void commonboardrunGame();
+void commonboardlogmultiple(int c), commonboardprintGameStats(), commonboardrunGames(), commonboardnumberofGames(int b);
 void commonboardlogtotalmultiple(), commonboardallocatemultiple(int c, int d);
 void prefcommonboardlogmultiple1(int c), prefcommonboardprintGameStats1(), prefcommonboardallocatemultiple1(int c, int d);
 void prefcommonboardallocatemultiple2(int c, int d), prefboardrunGames1(), prefcommonboardrunGames1();
@@ -64,7 +65,7 @@ int snakesshuffled = 0;
 int laddersshuffled = 0;
 int turnsofdiceforagame = 0;
 float turnsasmoney = 100;
-int turnsasmoneytakeninx = 0;
+float turnsasmoneytakeninx = 0;
 float interest = 0.006;
 float prefinterest = 0.0045;
 float basispoint = 100;
@@ -96,7 +97,8 @@ struct gamestate
 struct gamestate prefgamestate, p;
 struct gamestate *gamestatestruct();
 void writegamestate(struct gamestate *p1);
-char *writegamestatestr(struct gamestate *p1);
+//char *writegamestatestr(struct gamestate *p1);
+void writegamestatestr(struct gamestate *p1);
 void printtime();
 /*	int pos=1,turnsofdice=0,turnsofgame=0;
 int a[]=new int[101];
@@ -148,9 +150,9 @@ main()
 	//printGameStatsrand();
 	//boardrunGames();
 	//boardprintGameStats();
-	//commonboardrunGames();
+	commonboardrunGames();
 	//prefcommonboardrunGames1();
-	prefcommonboardrunGames2();
+	//prefcommonboardrunGames2();
 	printf("hello ramesh\n");
 	getchar();
 }
@@ -261,7 +263,7 @@ void logmultiple()
 {
 	gameturnmultiple = ((10000 - basispoint) / 10000)*(turnsasmoneytakeninx + 1)
 		- turnsasmoneytakeninx*(1 + interest)
-		+ ((basispoint / (turnsofdiceforagame * 350)))*(turnsasmoneytakeninx + 1);
+		+ (basispoint / (turnsofdiceforagame * 350))*(turnsasmoneytakeninx + 1);
 	//gameturnmultiple = ((10000 - basispoint) / 10000) + ((basispoint / (turnsofdiceforagame * 350)));
 	//printf(" gameturnmultiple %f ", gameturnmultiple);
 	gametotalmultiple = gametotalmultiple * gameturnmultiple;
@@ -324,7 +326,7 @@ void printGameStatsrand()
 	for (int i = 1; i <= 10; i++)
 		printf("SnakeHit%d = %d \n", i, snakeHit[i]);
 }
-void boardrunGames()
+void boardrunGame()
 {
 	gameturnmultiple = 1;
 	turnsasmoneytakeninx = 0;
@@ -335,13 +337,13 @@ void boardrunGames()
 		boardturnsofgame[h] = 0;
 		//boardgameturnmultiple[h] = 1;
 		//boardgametotalmultiple[h] = 1;
-		commonboardgametotalmultipletakenin[h] = 0;
+		//commonboardgametotalmultipletakenin[h] = 0;
 		for (int i = 1; i < 31; i++)
 		{
 			//boardgameturnmultiple[h][i] = 1;
-			boardgametotalmultiple[h][i] = 0.01;
-			if (h<2)commonboardgametotalmultipleleft[i] = 1;
-			if (h<2)commonboardgametotalmultipleadded[i] = 1;
+			boardgametotalmultiple[h][i] = 1;
+			//if (h<2)commonboardgametotalmultipleleft[i] = 1;
+			//if (h<2)commonboardgametotalmultipleadded[i] = 1;
 		}
 
 		for (int i = 1; i<101; i++)
@@ -353,9 +355,9 @@ void boardrunGames()
 
 		for (int i = 1; i < 12; i++)boardladderHit[h][i] = 0;
 		for (int i = 1; i < 11; i++)boardsnakeHit[h][i] = 0;
+		boardfillLaddersrand(h);
+		boardfillSnakesrand(h);
 	}
-	boardfillLaddersrand();
-	boardfillSnakesrand();
 	while (turnsofdice<numberofdiceturns)
 	{
 		boardDice();
@@ -363,38 +365,31 @@ void boardrunGames()
 		for (int h = 1; h < 101; h++)
 		{
 			if (boardpos[h] > 100)boardnumberofGames1(h);
-			boardSnakesLadders();
 		}
-		boardshuffleSnakesrand();
-		boardshuffleLaddersrand();
+		boardSnakesLadders();
+		boardshuffleSnakesLaddersrand();
 	}
-	commonboardlogtotalmultiple();
+	//commonboardlogtotalmultiple();
 }
-void boardfillLaddersrand()
+void boardfillLaddersrand(int h)
 {
-	for (int h = 1; h<101; h++)
+	for (int i = 0; i<11; i++)
 	{
-		for (int i = 0; i<11; i++)
+		if ((rand() % 6) > 2)
 		{
-			if ((rand() % 6) > 2)
-			{
-				boardstates[h][ladderStart[i]] = ladderEnd[i];
-				boardlIndex[h][ladderStart[i]] = i + 1;
-			}
+			boardstates[h][ladderStart[i]] = ladderEnd[i];
+			boardlIndex[h][ladderStart[i]] = i + 1;
 		}
 	}
 }
-void boardfillSnakesrand()
+void boardfillSnakesrand(int h)
 {
-	for (int h = 1; h<101; h++)
+	for (int i = 0; i<10; i++)
 	{
-		for (int i = 0; i<10; i++)
+		if ((rand() % 6) > 2)
 		{
-			if ((rand() % 6) > 2)
-			{
-				boardstates[h][snakeStart[i]] = snakeEnd[i];
-				boardsIndex[h][snakeStart[i]] = i + 1;
-			}
+			boardstates[h][snakeStart[i]] = snakeEnd[i];
+			boardsIndex[h][snakeStart[i]] = i + 1;
 		}
 	}
 }
@@ -436,7 +431,7 @@ void boardlogmultiple(int h)
 		turnsasmoneytakeninx = i - 1;
 		gameturnmultiple = ((10000 - basispoint) / 10000)*(turnsasmoneytakeninx + 1)
 			- turnsasmoneytakeninx*(1 + interest)
-			+ ((basispoint / (boardturnsofdiceforagame[h] * 350)))*(turnsasmoneytakeninx + 1);
+			+ (basispoint / (boardturnsofdiceforagame[h] * 350))*(turnsasmoneytakeninx + 1);
 		boardgametotalmultiple[h][i] = boardgametotalmultiple[h][i] * gameturnmultiple;
 		gameturnmultiple = 1;
 	}
@@ -453,10 +448,10 @@ void boardnumberofGames1(int h)
 	//System.out.println("position="+pos);
 	boardturnsofgame[h]++;
 	//turnsasmoney = turnsasmoney*(((10000 - basispoint) / 10000) + (basispoint / (turnsofdiceforagame * 350)));
-	//boardlogmultiple(h);
+	boardlogmultiple(h);
 	//commonboardlogmultiple(h);
 	//prefcommonboardlogmultiple(h);
-	prefcommonboardlogmultiple1(h);
+	//prefcommonboardlogmultiple1(h);
 	boardturnsofdiceforagame[h] = 0;
 	//if(turnsofgame%35==0)numberofdiceturns=numberofdiceturns+100;
 }
@@ -472,10 +467,20 @@ void boardprintGameStats()
 		//}
 		//for (int h = 1; h < 101; h++)
 		//{
-		for (int i = 1; i <= 11; i++)
-			printf("L %d = %d \n", i, boardladderHit[h][i]);
-		for (int i = 1; i <= 10; i++)
-			printf("S %d = %d \n", i, boardsnakeHit[h][i]);
+		//for (int i = 1; i <= 11; i++)
+			//printf("L %d = %d \n", i, boardladderHit[h][i]);
+		//for (int i = 1; i <= 10; i++)
+			//printf("S %d = %d \n", i, boardsnakeHit[h][i]);
+	}
+}
+void boardrunGames()
+{
+	for (int i = 0; i < 3; i++)
+	{
+		boardrunGame();
+		turnsofdice = 0;
+		//commonboardprintGameStats();
+		boardprintGameStats();
 	}
 }
 void commonboardlogmultiple(int h)
@@ -486,7 +491,7 @@ void commonboardlogmultiple(int h)
 		turnsasmoneytakeninx = i - 1;
 		gameturnmultiple = ((10000 - basispoint) / 10000)*(turnsasmoneytakeninx + 1)
 			- turnsasmoneytakeninx*(1 + interest)
-			+ ((basispoint / (boardturnsofdiceforagame[h] * 350)))*(turnsasmoneytakeninx + 1);
+			+ (basispoint / (boardturnsofdiceforagame[h] * 350))*(turnsasmoneytakeninx + 1);
 		boardgametotalmultiple[h][i] = boardgametotalmultiple[h][i] * gameturnmultiple;
 		commonboardallocatemultiple(h, i);
 		//commonboardgametotalmultiple[i] = commonboardgametotalmultiple[i] + boardgametotalmultiple[h][i];
@@ -507,8 +512,8 @@ void commonboardprintGameStats()
 		printf(" %.1f ", commonboardgametotalmultipleleft[i]);
 	}
 	printf("\n");
-	printf("snakes shuffled %d ", snakesshuffled);
-	printf("ladders shuffled %d \n", laddersshuffled);
+	//printf("snakes shuffled %d ", snakesshuffled);
+	//printf("ladders shuffled %d \n", laddersshuffled);
 	for (int h = 1; h<101; h++)
 	{
 		printf(" %.1f ", boardgametotalmultiple[h][1]);
@@ -519,38 +524,72 @@ void commonboardrunGames()
 {
 	for (int i = 0; i < 3; i++)
 	{
-		boardrunGames();
+		commonboardrunGame();
 		turnsofdice = 0;
-		//commonboardprintGameStats();
-		prefcommonboardprintGameStats1();
+		commonboardprintGameStats();
+		//prefcommonboardprintGameStats1();
 	}
 }
-void boardshuffleLaddersrand()
+void commonboardrunGame()
 {
+	gameturnmultiple = 1;
+	turnsasmoneytakeninx = 0;
 	for (int h = 1; h<101; h++)
 	{
-		if ((h * 1) == (rand() % 100 + 1))
+		boardpos[h] = 1;
+		boardturnsofdiceforagame[h] = 0;
+		boardturnsofgame[h] = 0;
+		//boardgameturnmultiple[h] = 1;
+		//boardgametotalmultiple[h] = 1;
+		//commonboardgametotalmultipletakenin[h] = 0;
+		for (int i = 1; i < 31; i++)
 		{
-			//printf("shuffling ladders %d ", h);
-			laddersshuffled++;
-			for (int i = 1; i<101; i++)
-			{
-				boardstates[h][i] = 0;
-				boardlIndex[h][i] = 0;
-				boardsIndex[h][i] = 0;
-			}
-			for (int i = 0; i < 11; i++)
-			{
-				if ((rand() % 6) > 2)
-				{
-					boardstates[h][ladderStart[i]] = ladderEnd[i];
-					boardlIndex[h][ladderStart[i]] = i + 1;
-				}
-			}
+			//boardgameturnmultiple[h][i] = 1;
+			boardgametotalmultiple[h][i] = 0.01;
+			if (h<2)commonboardgametotalmultipleleft[i] = 1;
+			if (h<2)commonboardgametotalmultipleadded[i] = 1;
 		}
+
+		for (int i = 1; i<101; i++)
+		{
+			boardstates[h][i] = 0;
+			boardlIndex[h][i] = 0;
+			boardsIndex[h][i] = 0;
+		}
+
+		for (int i = 1; i < 12; i++)boardladderHit[h][i] = 0;
+		for (int i = 1; i < 11; i++)boardsnakeHit[h][i] = 0;
+		boardfillLaddersrand(h);
+		boardfillSnakesrand(h);
 	}
+	while (turnsofdice<numberofdiceturns)
+	{
+		boardDice();
+		boardTurnsofDice();
+		for (int h = 1; h < 101; h++)
+		{
+			if (boardpos[h] > 100)commonboardnumberofGames(h);
+		}
+		boardSnakesLadders();
+		boardshuffleSnakesLaddersrand();
+	}
+	//commonboardlogtotalmultiple();
 }
-void boardshuffleSnakesrand()
+void commonboardnumberofGames(int h)
+{
+	boardpos[h] = boardpos[h] - 100;
+	//System.out.println("turnsofgame="+turnsofgame);
+	//System.out.println("position="+pos);
+	boardturnsofgame[h]++;
+	//turnsasmoney = turnsasmoney*(((10000 - basispoint) / 10000) + (basispoint / (turnsofdiceforagame * 350)));
+	//boardlogmultiple(h);
+	commonboardlogmultiple(h);
+	//prefcommonboardlogmultiple(h);
+	//prefcommonboardlogmultiple1(h);
+	boardturnsofdiceforagame[h] = 0;
+	//if(turnsofgame%35==0)numberofdiceturns=numberofdiceturns+100;
+}
+void boardshuffleSnakesLaddersrand()
 {
 	for (int h = 1; h<101; h++)
 	{
@@ -558,20 +597,15 @@ void boardshuffleSnakesrand()
 		{
 			//printf("shuffling snakes %d ", h);
 			snakesshuffled++;
+			laddersshuffled++;
 			for (int i = 1; i<101; i++)
 			{
 				boardstates[h][i] = 0;
 				boardlIndex[h][i] = 0;
 				boardsIndex[h][i] = 0;
 			}
-			for (int i = 0; i < 10; i++)
-			{
-				if ((rand() % 6) > 2)
-				{
-					boardstates[h][snakeStart[i]] = snakeEnd[i];
-					boardsIndex[h][snakeStart[i]] = i + 1;
-				}
-			}
+			boardfillSnakesrand(h);
+			boardfillLaddersrand(h);
 		}
 	}
 }
@@ -652,7 +686,7 @@ void prefcommonboardlogmultiple1(int h)
 	//turnsasmoneytakeninx = turnsasmoneytakeninx + (commonboardgametotalmultipletakenin[i]/commonboardgametotalmultipleadded[i]);
 	gameturnmultiple = ((10000 - basispoint) / 10000)*(turnsasmoneytakeninx + 1)
 		- turnsasmoneytakeninx*(1 + interest)
-		+ ((basispoint / (boardturnsofdiceforagame[h] * 350)))*(turnsasmoneytakeninx + 1);
+		+ (basispoint / (boardturnsofdiceforagame[h] * 350))*(turnsasmoneytakeninx + 1);
 	boardgametotalmultiple[h][1] = boardgametotalmultiple[h][1] * gameturnmultiple;
 	prefcommonboardallocatemultiple1(h, 1);
 	gameturnmultiple = 1;
@@ -743,9 +777,9 @@ void prefboardrunGames1()
 
 		for (int i = 1; i < 12; i++)boardladderHit[h][i] = 0;
 		for (int i = 1; i < 11; i++)boardsnakeHit[h][i] = 0;
+		boardfillLaddersrand(h);
+		boardfillSnakesrand(h);
 	}
-	boardfillLaddersrand();
-	boardfillSnakesrand();
 	while (turnsofdice<numberofdiceturns)
 	{
 		boardDice();
@@ -753,10 +787,9 @@ void prefboardrunGames1()
 		for (int h = 1; h < 101; h++)
 		{
 			if (boardpos[h] > 100)boardnumberofGames2(h);
-			boardSnakesLadders();
 		}
-		boardshuffleSnakesrand();
-		boardshuffleLaddersrand();
+		boardSnakesLadders();
+		boardshuffleSnakesLaddersrand();
 		if (turnsofdice % 30 == 0)
 			prefcommonboardlogwholemultiple1();
 	}
@@ -839,7 +872,7 @@ void prefcommonboardlogmultiple2(int h)
 	turnsasmoneytakeninx = 0;
 	gameturnmultiple = ((10000 - basispoint) / 10000)*(turnsasmoneytakeninx + 1)
 		- turnsasmoneytakeninx*(1 + interest)
-		+ ((basispoint / (boardturnsofdiceforagame[h] * 350)))*(turnsasmoneytakeninx + 1);
+		+ (basispoint / (boardturnsofdiceforagame[h] * 350))*(turnsasmoneytakeninx + 1);
 	prefboardgametotalmultiple[h] = prefboardgametotalmultiple[h] * gameturnmultiple;
 	prefcommonboardallocatemultiple3(h);
 	gameturnmultiple = 1;
@@ -881,8 +914,9 @@ void prefcommonboardrunGames2()
 		prefboardrunGames2();
 		//struct gamestate prefgamestate1 = gamestatestruct();
 		struct gamestate *prefgamestate1 = gamestatestruct();
-		//writegamestate(prefgamestate1);
-		char *s1 = writegamestatestr(prefgamestate1);
+		writegamestate(prefgamestate1);
+		//char *s1 =
+		//writegamestatestr(prefgamestate1);
 		//printf("%s",(*writegamestatestr(prefgamestate1)));
 		//fflush(stdout);
 		//printf("%.1f \n", prefgamestate1->logprefgamewholemultiple);
@@ -926,8 +960,8 @@ void prefboardrunGames2()
 		for (int h = 1; h < numberofboards; h++)
 		{
 			if (boardpos[h] > boardsize - 1)boardnumberofGames2(h);
-			boardSnakesLadders();
 		}
+		boardSnakesLadders();
 		prefboardshuffleSnakesLaddersrand();
 		//prefboardshuffleSnakesrand();
 		//prefboardshuffleLaddersrand();
@@ -1089,12 +1123,13 @@ void writegamestate(struct gamestate *p1)
 		//fprintf(fp, "boardturnsofdiceforagame[%d] = %d \n" ,h, p1->boardturnsofdiceforagame[h]);
 		//fprintf(fp, "boardturnsofgame[%d] = %d \n" ,h, p1->boardturnsofgame[h]);
 		fprintf(fp, "prefboardgametotalmultiple[%d] = %.1f \n", h, p1->prefboardgametotalmultiple[h]);
-		for (int i = 1; i<boardsize; i++)
+		for (int i = 1; i<p1->gameboardsize; i++)
 		{
-			//p.boardstates[h][i] = boardstates[h][i];
+			fprintf(fp, "%d ", p1->boardstates[h][i]);
 			//p.boardlIndex[h][i] = boardlIndex[h][i];
 			//p.boardsIndex[h][i] = boardsIndex[h][i];
 		}
+		fprintf(fp, "\n");
 		//for (int i = 1; i < 12; i++)//p.boardladderHit[h][i] = boardladderHit[h][i];
 		//for (int i = 1; i < 11; i++)//p.boardsnakeHit[h][i] = boardsnakeHit[h][i];
 	}
@@ -1115,9 +1150,18 @@ void printtime()
 	//printf("%s\n", s);
 	printf("now: %d-%d-%d %d:%d:%d\n", tm1->tm_year + 1900, tm1->tm_mon + 1, tm1->tm_mday, tm1->tm_hour, tm1->tm_min, tm1->tm_sec);
 }
-char *writegamestatestr(struct gamestate *p1)
+void writegamestatestr(struct gamestate *p1)
 {
-	char *s1 = "";
-	sprintf(s1, "%f", p1->logprefgamewholemultiple);
-	return s1;
+	char *s1;
+	char s2[30];
+	int n;
+	printf("%.1f \n", p1->logprefgamewholemultiple);
+	s1 = "hello ramesh 2";
+	n = sprintf(s2, "%.1f \n", p1->logprefgamewholemultiple);
+	printf("%d", n);
+	//strcat(s1,'\0');
+	puts(s1);
+	puts(s2);
+	printf("%d", strlen(s1));
+	//return s1;
 }
